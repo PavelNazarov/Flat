@@ -73,7 +73,7 @@ def check_status():
                     f"🎉 <b>Квартира №{flat_number} СВОБОДНА!</b>\n"
                     f"ID: {current_id}\n"
                     f"Цена: {price} BYN\n"
-                    f"Ссылка: https://rpt.realting.com/"
+                    f"Ссылка: https://rpt.realting.com/uyutny/chess-plus/estate/508"
                 )
                 send_telegram_message(msg)
 
