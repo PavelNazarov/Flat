@@ -6,12 +6,11 @@ import requests
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-# Настройки Telegram
-#TELEGRAM_TOKEN = "8798375277:AAGaTJk-Elca_wefMY261WEAPU12yAcqlJ4"
-#TELEGRAM_CHAT_ID = "985267897"
+# Список ID квартир для отслеживания
+TARGET_IDS = [32050, 32045]
 
-# Данные запроса
-URL = "https://admin.realtyprotech.com/api/v1/public/instances/32050?first_token=uyutny"
+# Шаблон URL (вместо конкретного ID подставляется {flat_id})
+BASE_URL = "https://admin.realtyprotech.com/api/v1/public/instances/{flat_id}?first_token=uyutny"
 
 HEADERS = {
     "Accept": "application/json, text/plain, */*",
@@ -28,8 +27,6 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
     "X-Accept-Language": "1",
 }
-TARGET_ID = 32050
-CHECK_INTERVAL_SECONDS = 300  # Проверка каждые 5 минут
 
 
 def send_telegram_message(text):
@@ -46,43 +43,45 @@ def send_telegram_message(text):
     except Exception as e:
         print(f"Ошибка отправки в Telegram: {e}")
 
+
 def check_status():
-    try:
-        response = requests.get(URL, headers=HEADERS, timeout=10)
-        if response.status_code != 200:
-            print(f"Сервер вернул код {response.status_code}")
-            return False
+    for target_id in TARGET_IDS:
+        url = BASE_URL.format(flat_id=target_id)
+        try:
+            response = requests.get(url, headers=HEADERS, timeout=10)
+            if response.status_code != 200:
+                print(f"Ошибка HTTP {response.status_code} для ID {target_id}")
+                continue
 
-        json_data = response.json()
-        instance = json_data.get("data", {}).get("instance", {})
+            json_data = response.json()
+            instance = json_data.get("data", {}).get("instance", {})
 
-        current_id = instance.get("id")
-        status_info = instance.get("status", {})
-        status_type = status_info.get("type")
-        status_name = status_info.get("name")
-        flat_number = instance.get("number")
+            current_id = instance.get("id")
+            status_info = instance.get("status", {})
+            status_type = status_info.get("type")
+            status_name = status_info.get("name")
+            flat_number = instance.get("number")
+            price = instance.get("price")
 
-        print(
-            f"Проверка квартиры №{flat_number} (ID {current_id}): Статус = {status_name} (type: {status_type})"
-        )
-
-        # Если статус изменился (стал 1 или "Свободно")
-        if current_id == TARGET_ID and (
-            status_type == 1 or status_name == "Свободно"
-        ):
-            msg = (
-                f"🎉 <b>Квартира №{flat_number} СВОБОДНА!</b>\n"
-                f"ID: {current_id}\n"
-                f"Цена: {instance.get('price')} BYN\n"
-                f"Ссылка: https://rpt.realting.com/"
+            print(
+                f"Проверка квартиры №{flat_number} (ID {current_id}): Статус = {status_name} (type: {status_type})"
             )
-            send_telegram_message(msg)
-            return True
 
-    except Exception as e:
-        print(f"Ошибка при выполнении запроса: {e}")
+            # Если статус изменился (стал 1 или "Свободно")
+            if status_type == 1 or status_name == "Свободно":
+                msg = (
+                    f"🎉 <b>Квартира №{flat_number} СВОБОДНА!</b>\n"
+                    f"ID: {current_id}\n"
+                    f"Цена: {price} BYN\n"
+                    f"Ссылка: https://rpt.realting.com/"
+                )
+                send_telegram_message(msg)
 
-    return False
+        except Exception as e:
+            print(f"Ошибка выполнения запроса для ID {target_id}: {e}")
+
+        # Небольшая пауза между запросами
+        time.sleep(10)
 
 
 if __name__ == "__main__":
