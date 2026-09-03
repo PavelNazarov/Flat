@@ -7,7 +7,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # Список ID квартир для отслеживания
-TARGET_IDS = [32050, 32045]
+TARGET_IDS = [32050, 32045, 32119, 32170]
 
 # Шаблон URL (вместо конкретного ID подставляется {flat_id})
 BASE_URL = "https://admin.realtyprotech.com/api/v1/public/instances/{flat_id}?first_token=uyutny"
@@ -81,7 +81,7 @@ def check_status():
             print(f"Ошибка выполнения запроса для ID {target_id}: {e}")
 
         # Небольшая пауза между запросами
-        time.sleep(10)
+        time.sleep(2)
 
 
 if __name__ == "__main__":
