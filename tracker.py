@@ -68,8 +68,7 @@ def check_status():
             )
 
             # Если статус изменился (стал 1 или "Свободно")
-            # if status_type == 1 or status_name == "Свободно":
-            if status_type == 2 or status_name == "Бронь":
+            if status_type == 1 or status_name == "Свободно":
                 msg = (
                     f"🎉 <b>Квартира №{flat_number} СВОБОДНА!</b>\n"
                     f"ID: {current_id}\n"
