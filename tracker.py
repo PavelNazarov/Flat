@@ -7,7 +7,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # Список ID квартир для отслеживания
-TARGET_IDS = [31868, 31810, 32038, 31811, 31935, 31937, 32050, 32170, 31930, 31922, 32044, 32039, 32098, 32108]
+TARGET_IDS = [31868, 31810, 32038, 31811, 31935, 32050, 32170, 31930, 31922, 32044, 32039, 32098, 32108]
 
 # Шаблон URL (вместо конкретного ID подставляется {flat_id})
 BASE_URL = "https://admin.realtyprotech.com/api/v1/public/instances/{flat_id}?first_token=uyutny"
